@@ -2,8 +2,9 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\Participant;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,11 +13,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
+        $user = User::factory()->create(['name' => 'Test User', 'email' => 'test@example.com']);
 
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        $round = $user->rounds()->create(['composition' => 1]);
+        $sides = $round->sides()->createMany([['type' => 0], ['type' => 1]]);
+
+        $radiantSide = $sides->firstWhere('type', 0);
+
+        $radiantSide->participants()->save((new Participant())->user()->associate($user));
     }
 }
